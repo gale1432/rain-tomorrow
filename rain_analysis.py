@@ -12,12 +12,14 @@ def load():
     log_reg = joblib.load('logistic_regression.sav')
     xgb = joblib.load('xgb_ensemble.sav')
     adab = joblib.load('adaboost_model.sav')
+    pca = joblib.load('pca.sav')
     pipeline = joblib.load('pipeline.sav')
-    return (pipeline, log_reg, adab, xgb)
+    return (pipeline, pca, log_reg, adab, xgb)
 
 def predict(data):
-    pipeline, log_reg, adab, xgb = load()
+    pipeline, pca, log_reg, adab, xgb = load()
     pipelined_data = pipeline.transform(data)
+    pipelined_data = pca.transform(pipelined_data)
     pred_log = log_reg.predict(pipelined_data)
     pred_ad = adab.predict(pipelined_data)
     pred_xgb = xgb.predict(pipelined_data)
