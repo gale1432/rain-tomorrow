@@ -77,7 +77,14 @@ def predict(data):
     pred_xgb = xgb.predict(pipelined_data)
     return (pred_log[0], pred_ad[0], pred_xgb[0])
     
-st.title("¿Va a llover mañana?")
+st.title("Modelos de Machine Learning para saber si llovió el día siguiente")
+st.text("Universidad Autónoma de Chihuahua")
+st.text("Facultad de Ingeniería")
+st.text("Maestría en Ingeniería en Computación")
+st.text("Machine Learning")
+st.text("Proyecto Final Rain in Australia")
+st.text("Gael Aristides Hinojos Ramírez")
+st.text("384104")
 st.header("Variables")
 col1, col2 = st.columns(2)
 
@@ -119,8 +126,6 @@ with col2:
 
 
 if st.button("¿Va a llover mañana?"):
-    """data = {'slc': sep_len_cm, 'swc': sep_wid_cm, 'plc': pet_len_cm, 'pwc': pet_wid_cm}
-    df = pd.DataFrame([list(data.values())], columns=['SepalLengthCm', 'SepalWidthCm', 'PetalLengthCm', 'PetalWidthCm'])"""
     data = [
         location, min_temp, max_temp, rainfall, evaporation, sunshine, wind_gust_dir, wind_gust_speed, wind_dir_9am,
         wind_dir_3pm, wind_speed_9am, wind_speed_3pm, humidity_9am, humidity_3pm, pressure_9am, pressure_3pm,
