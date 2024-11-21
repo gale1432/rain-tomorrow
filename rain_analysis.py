@@ -8,6 +8,55 @@ import numpy as np
 import streamlit as st
 import joblib
 import xgboost
+from sklearn.base import BaseEstimator, TransformerMixin
+import hashlib
+
+#Se crea un Imputador que convierte las columnas de tipo String a valores hash
+class StringHasher(BaseEstimator, TransformerMixin):
+    def hashString(self, s):
+        s = str(s)
+        return int(hashlib.sha256(s.encode('utf-8')).hexdigest(), 16) % 10**4
+    def fit(self, X, y=None):
+        return self
+    def transform(self, X):
+        new_X = X.copy()
+        new_X['Location'] = new_X['Location'].apply(self.hashString)
+        new_X['WindDir3pm'] = new_X['WindDir3pm'].apply(self.hashString)
+        new_X['WindDir9am'] = new_X['WindDir9am'].apply(self.hashString)
+        new_X['WindGustDir'] = new_X['WindGustDir'].apply(self.hashString)
+        return new_X
+    
+#Se crea un Imputador que calcula la media por Localidad
+class MeanByLocation(BaseEstimator, TransformerMixin):
+    def __init__(self) -> None:
+        self.dict_mean = {}
+        new_X = []
+        super().__init__()
+    def mean_filler(self, row):
+        #print(row['Location'])
+        values_fill = self.dict_mean[row['Location']]
+        row['MinTemp'] = (values_fill['MinTemp'] if pd.isna(row['MinTemp']) else row['MinTemp'])
+        row['MaxTemp']  = (values_fill['MaxTemp'] if pd.isna(row['MaxTemp']) else row['MaxTemp'])
+        row['Rainfall']  = (values_fill['Rainfall'] if pd.isna(row['Rainfall']) else row['Rainfall'])
+        row['WindGustSpeed'] = (values_fill['WindGustSpeed'] if pd.isna(row['WindGustSpeed']) else row['WindGustSpeed'])
+        row['WindSpeed9am'] = (values_fill['WindSpeed9am'] if pd.isna(row['WindSpeed9am']) else row['WindSpeed9am'])
+        row['WindSpeed3pm'] = (values_fill['WindSpeed3pm'] if pd.isna(row['WindSpeed3pm']) else row['WindSpeed3pm'])
+        row['Humidity9am'] = (values_fill['Humidity9am'] if pd.isna(row['Humidity9am']) else row['Humidity9am'])
+        row['Humidity3pm'] = (values_fill['Humidity3pm'] if pd.isna(row['Humidity3pm']) else row['Humidity3pm'])
+        row['Pressure9am'] = (values_fill['Pressure9am'] if pd.isna(row['Pressure9am']) else row['Pressure9am'])
+        row['Pressure3pm'] = (values_fill['Pressure3pm'] if pd.isna(row['Pressure3pm']) else row['Pressure3pm'])
+        row['Temp9am'] = (values_fill['Temp9am'] if pd.isna(row['Temp9am']) else row['Temp9am'])
+        row['Temp3pm'] = (values_fill['Temp3pm'] if pd.isna(row['Temp3pm']) else row['Temp3pm'])
+        return row
+    def fit(self, X, y=None):
+        self.new_X = X.copy()
+        self.dict_mean =  self.new_X.groupby('Location').mean().to_dict('index')
+        print(self.dict_mean)
+        return self
+    def transform(self, X):
+        real_X = X.copy()
+        real_X = real_X.apply(self.mean_filler, axis=1)
+        return real_X
 
 def load():
     log_reg = joblib.load('logistic_regression.sav')
