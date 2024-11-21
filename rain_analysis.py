@@ -67,6 +67,10 @@ def load():
     return (pipeline, pca, log_reg, adab, xgb)
 
 def predict(data):
+    if data['RainToday'] == 'Yes':
+        data['RainToday'] = 1
+    else:
+        data['RainToday'] = 0
     pipeline, pca, log_reg, adab, xgb = load()
     pipelined_data = pipeline.transform(data)
     pipelined_data = pca.transform(pipelined_data)
