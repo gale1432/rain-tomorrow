@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import joblib
+import xgboost
 
 def load():
     log_reg = joblib.load('logistic_regression.sav')
